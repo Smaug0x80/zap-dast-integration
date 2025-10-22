@@ -1,19 +1,56 @@
-name: OWASP ZAP Baseline Scan
+# Nome do nosso fluxo de trabalho de segurança
+name: ZAP Baseline Scan - Simples
 
 on:
-  push:
-    branches: [ main ]
+  # ATENÇÃO:
+  # Removi o 'push' por enquanto.
+  # Agora, este scan SÓ VAI RODAR quando você acionar manualmente.
+  # Isso nos dá mais controle para testar.
+  workflow_dispatch:
 
 jobs:
   zap_scan:
+    name: Run ZAP Simple Scan
     runs-on: ubuntu-latest
+
+    # ===============================================
+    # PERMISSÕES - ISTO É OBRIGATÓRIO!
+    # Sem isso, o upload para a aba "Security" falha com
+    # o erro "Resource not accessible".
+    # ===============================================
+    permissions:
+      contents: read       # Permissão para o 'actions/checkout' ler o repositório
+      security-events: write # Permissão para o 'upload-sarif' escrever na aba Security
+
     steps:
-      - name: Checkout source code
+      # Passo 1: Checkout (necessário para a action rodar)
+      - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Run OWASP ZAP Baseline scan
-        uses: zaproxy/action-baseline@v0.6.1
+
+      # Passo 2: ZAP Baseline Scan
+      - name: ZAP Baseline Scan (Alvo Simples)
+        uses: zaproxy/action-baseline@v0.11.0
         with:
-          docker_name: 'owasp/zap2docker-stable'
-          target: 'https://juice-shop.herokuapp.com' # Substitua pela URL do seu site
-          # rules_file_name: '.zap/rules.tsv' # Opcional: para ignorar alertas
-          # cmd_options: '-a' # Opcional: para adicionar mais opções de linha de comando
+          # MUDANÇA IMPORTANTE: Usando um alvo mais simples e rápido.
+          # O Juice Shop (Heroku) pode ser muito lento ou bloquear scanners.
+          target: 'http://testphp.vulnweb.com/'
+
+          # MUDANÇA IMPORTANTE:
+          # Nosso objetivo agora é testar a INTEGRAÇÃO.
+          # Vamos deixar 'false' para que o workflow NÃO FALHE (fique vermelho)
+          # se encontrar vulnerabilidades. Queremos que ele chegue até o fim.
+          fail_action: false
+
+          # Gerar o relatório SARIF é essencial para a integração
+          report_sarif: 'zap-results.sarif'
+         
+          # (Removi o rules_file e o report_html para simplificar ao máximo)
+
+      # Passo 3: Upload do SARIF para a aba "Security"
+      # Este passo pega o 'zap-results.sarif' e o envia
+      # para a aba "Security" do GitHub.
+      - name: Upload SARIF to GitHub Security Tab
+        if: always() # Garantir que o upload ocorra sempre
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'zap-results.sarif'
