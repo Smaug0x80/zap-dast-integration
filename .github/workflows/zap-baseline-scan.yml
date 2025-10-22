@@ -61,7 +61,7 @@ jobs:
       # Este passo sempre executa (always())
       - name: Upload HTML Report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           # Nome do artefato que aparecerá no GitHub
           name: zap-baseline-report
