@@ -73,7 +73,7 @@ jobs:
       # Ele envia os resultados do teste para a aba "Security" do GitHub.
       - name: Upload SARIF to GitHub Security Tab
         if: always()
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           # O arquivo SARIF que o ZAP gerou no Passo 2
           sarif_file: 'zap-results.sarif'
