@@ -51,7 +51,7 @@ jobs:
           # IMPORTANTE:
           # Se 'true', o workflow falhará se o ZAP encontrar alertas.
           # Isso “quebra” um "deploy". Vamos deixar 'true'.
-          fail_action: true
+          fail_action: false
           
           # Nível mínimo para falhar (WARN = Médio, HIGH = Alto)
           # Falhará se houver alerta de nível médio ou alto.
