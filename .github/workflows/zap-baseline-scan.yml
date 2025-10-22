@@ -10,7 +10,7 @@ on:
 
 jobs:
   zap_scan:
-    name: Run ZAP Simple Scan
+    name: Run ZAP Simple
     runs-on: ubuntu-latest
 
     # ===============================================
