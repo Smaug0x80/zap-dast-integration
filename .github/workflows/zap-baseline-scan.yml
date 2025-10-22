@@ -17,8 +17,30 @@ jobs:
     name: Run ZAP Baseline Scan
     # A máquina virtual que usaremos (Ubuntu é a padrão e recomendada)
     runs-on: ubuntu-latest
+# ===============================================
+    # ADICIONE ESTA SEÇÃO DE PERMISSÕES AQUI
+    # ===============================================
+    permissions:
+      contents: read       # Permissão para o 'actions/checkout' ler o repositório
+      security-events: write # Permissão para o 'upload-sarif' escrever na aba Security
+    # ===============================================
 
     steps:
+      # Passo 1: Checkout (precisa de 'contents: read')
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Passo 2: ZAP Scan
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.11.0
+        with:
+          target: 'https://juice-shop.herokuapp.com'
+          rules_file_name: '.zap/dast-rules.conf'
+          report_sarif: 'zap-results.sarif'
+          report_html: 'zap-report.html'
+          fail_action: true
+          min_level: 'WARN'
+
       # Passo 1: Precisamos "baixar" o código do nosso repositório
       # (Mesmo que seja só o README, isso é necessário para a Action)
       - name: Checkout repository
