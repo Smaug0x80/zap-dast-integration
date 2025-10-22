@@ -1,56 +1,44 @@
-# Nome do nosso fluxo de trabalho de segurança
-name: ZAP Baseline Scan - Simples
+name: ZAP Baseline Scan - Simples (com Debug)
 
 on:
-  # ATENÇÃO:
-  # Removi o 'push' por enquanto.
-  # Agora, este scan SÓ VAI RODAR quando você acionar manualmente.
-  # Isso nos dá mais controle para testar.
   workflow_dispatch:
 
 jobs:
   zap_scan:
-    name: Run ZAP Simple
+    name: Run ZAP Simple Scan
     runs-on: ubuntu-latest
-
-    # ===============================================
-    # PERMISSÕES - ISTO É OBRIGATÓRIO!
-    # Sem isso, o upload para a aba "Security" falha com
-    # o erro "Resource not accessible".
-    # ===============================================
+   
     permissions:
-      contents: read       # Permissão para o 'actions/checkout' ler o repositório
-      security-events: write # Permissão para o 'upload-sarif' escrever na aba Security
+      contents: read
+      security-events: write
 
     steps:
-      # Passo 1: Checkout (necessário para a action rodar)
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Passo 2: ZAP Baseline Scan
       - name: ZAP Baseline Scan (Alvo Simples)
+        # Damos um 'id' a esta etapa para que possamos checá-la depois
+        id: zap_scan_step
         uses: zaproxy/action-baseline@v0.11.0
         with:
-          # MUDANÇA IMPORTANTE: Usando um alvo mais simples e rápido.
-          # O Juice Shop (Heroku) pode ser muito lento ou bloquear scanners.
           target: 'http://testphp.vulnweb.com/'
-
-          # MUDANÇA IMPORTANTE:
-          # Nosso objetivo agora é testar a INTEGRAÇÃO.
-          # Vamos deixar 'false' para que o workflow NÃO FALHE (fique vermelho)
-          # se encontrar vulnerabilidades. Queremos que ele chegue até o fim.
-          fail_action: false
-
-          # Gerar o relatório SARIF é essencial para a integração
+          fail_action: false # Mantemos false para o debug
           report_sarif: 'zap-results.sarif'
-         
-          # (Removi o rules_file e o report_html para simplificar ao máximo)
 
-      # Passo 3: Upload do SARIF para a aba "Security"
-      # Este passo pega o 'zap-results.sarif' e o envia
-      # para a aba "Security" do GitHub.
+      # ================================================================
+      # NOVA ETAPA DE DEPURAÇÃO:
+      # Vamos listar todos os arquivos no diretório de trabalho.
+      # Isso nos mostrará 100% se o 'zap-results.sarif' foi criado ou não.
+      # ================================================================
+      - name: List files in workspace
+        if: always() # Sempre rode esta etapa, mesmo se o ZAP falhou
+        run: |
+          echo "Listando arquivos no diretório de trabalho:"
+          ls -laR
+
+      # Etapa de Upload
       - name: Upload SARIF to GitHub Security Tab
-        if: always() # Garantir que o upload ocorra sempre
-        uses: github/codeql-action/upload-sarif@v3
+        if: always() # Mantemos always() por enquanto
+        uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'zap-results.sarif'
