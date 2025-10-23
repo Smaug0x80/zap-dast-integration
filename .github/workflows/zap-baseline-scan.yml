@@ -24,7 +24,7 @@ jobs:
         with:
           target: 'http://testphp.vulnweb.com/'
           fail_action: false # Mantemos false para o debug
-          report_sarif: 'zap-results.sarif'
+          #report_sarif: 'zap-results.sarif'
 
       # ================================================================
       # NOVA ETAPA DE DEPURAÇÃO:
