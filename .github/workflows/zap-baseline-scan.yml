@@ -9,7 +9,7 @@ jobs:
   dast-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v3
       - name: ZAP Scan
         uses: zaproxy/action-baseline@v0.14.0
         with:
