@@ -29,30 +29,9 @@ jobs:
         with:
           # Alvo de teste
           target: 'http://testphp.vulnweb.com/'
-         
-          # Nome do arquivo SARIF que a action vai gerar
-          # Este é o arquivo que será criado APÓS a conversão
-          sarif_file: 'zap-results.sarif'
-         
-          # (Opcional) Podemos pedir o JSON também, para depuração
-          json_file: 'zap-results.json'
 
-          # Usar a imagem Docker estável do ZAP
-          #docker_name: 'owasp/zap2docker-stable'
-
-          # ATENÇÃO - IMPORTANTE PARA O TESTE:
-          # Esta action falha (fica vermelha) se encontrar alertas.
-          # Vamos passar opções de linha de comando para o ZAP
-          # para que ele IGNORE os alertas (não falhe o build).
-          # Nosso objetivo agora é apenas a INTEGRAÇÃO.
-          # O '-I' significa 'Ignorar todos os alertas (não falhar)'.
-          cmd_options: '-I'
-
-      # Passo 3: Fazer o upload do SARIF gerado
-      # Este passo agora deve encontrar o arquivo 'zap-results.sarif',
-      # pois a action 'action-full-scan' é especialista em criá-lo.
-      - name: Upload SARIF to GitHub Security Tab
-        if: always() # Sempre rodar, mesmo se o passo anterior falhar
-        uses: github/codeql-action/upload-sarif@v4
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4 # Use the latest version
         with:
-          sarif_file: 'zap-results.sarif'
+          name: zap-html-report
+          path: zap_report.html 
