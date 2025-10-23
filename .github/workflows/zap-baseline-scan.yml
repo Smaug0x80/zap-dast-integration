@@ -25,7 +25,8 @@ jobs:
       # Esta action é mais poderosa. Ela tem a lógica de conversão
       # de JSON para SARIF embutida.
       - name: ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.11.0 # Note a action diferente
+        #uses: zaproxy/action-full-scan@v0.11.0 # Note a action diferente
+        uses: zaproxy/action-baseline@v0.14.0
         with:
           # Alvo de teste
           target: 'http://testphp.vulnweb.com/'
