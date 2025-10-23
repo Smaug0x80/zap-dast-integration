@@ -38,7 +38,7 @@ jobs:
           json_file: 'zap-results.json'
 
           # Usar a imagem Docker estável do ZAP
-          docker_name: 'owasp/zap2docker-stable'
+          #docker_name: 'owasp/zap2docker-stable'
 
           # ATENÇÃO - IMPORTANTE PARA O TESTE:
           # Esta action falha (fica vermelha) se encontrar alertas.
