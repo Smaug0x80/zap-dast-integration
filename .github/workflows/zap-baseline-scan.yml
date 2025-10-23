@@ -20,7 +20,7 @@ jobs:
       - name: ZAP Baseline Scan (Alvo Simples)
         # Damos um 'id' a esta etapa para que possamos checá-la depois
         id: zap-scan-step
-        uses: zaproxy/action-baseline@v0.12.0
+        uses: zaproxy/action-baseline@v0.14.0
         with:
           target: 'http://testphp.vulnweb.com/'
           fail_action: false # Mantemos false para o debug
