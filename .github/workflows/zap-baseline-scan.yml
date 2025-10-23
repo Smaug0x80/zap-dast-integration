@@ -36,14 +36,21 @@ jobs:
         run: |
           echo "Listando arquivos no diretório de trabalho:"
           ls -laR
-
+      
+      - name: 'Save Scan Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dast.sarif
+          path: dast.sarif.json
+     
       # Etapa de Upload
       - name: Upload SARIF to GitHub Security Tab
         if: always() # Mantemos always() por enquanto
         uses: github/codeql-action/upload-sarif@v4
         with:
           # Path to SARIF file relative to the root of the repository
-          sarif_file: zap-results.sarif
+          #sarif_file: zap-results.sarif
+          sarif_file: dast.sarif.json
           # Optional category for the results
           # Used to differentiate multiple results for one commit
           category: owap-zap
