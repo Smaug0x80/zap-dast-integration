@@ -39,6 +39,10 @@ jobs:
       # Etapa de Upload
       - name: Upload SARIF to GitHub Security Tab
         if: always() # Mantemos always() por enquanto
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: 'zap-results.sarif'
+          # Path to SARIF file relative to the root of the repository
+          sarif_file: results.sarif
+          # Optional category for the results
+          # Used to differentiate multiple results for one commit
+          category: my-analysis-tool
