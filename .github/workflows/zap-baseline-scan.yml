@@ -1,22 +1,54 @@
-name: ZAProxy scan
+name: ZAP Baseline Scan - Simples (com Debug)
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  dast-scan:
+  zap-scan:
+    name: Run ZAP Simple Scan
     runs-on: ubuntu-latest
+   
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
     steps:
-      - uses: actions/checkout@v3
-      - name: ZAP Scan
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: ZAP Baseline Scan (Alvo Simples)
+        # Damos um 'id' a esta etapa para que possamos checá-la depois
+        id: zap-scan-step
         uses: zaproxy/action-baseline@v0.14.0
         with:
-          target: 'https://www.zaproxy.org' # Target url for the scan
-      - name: Create sarif file from zaproxy results
-        uses: SvanBoxel/zaproxy-to-ghas@main
-      - name: Upload SARIF file
+          target: 'http://testphp.vulnweb.com/'
+          fail_action: false # Mantemos false para o debug
+          #report_sarif: 'zap-results.sarif'
+          docker_name: 'owasp/zap2docker-stable'
+          cmd_options: '-I'
+      # ================================================================
+      # NOVA ETAPA DE DEPURAÇÃO:
+      # Vamos listar todos os arquivos no diretório de trabalho.
+      # Isso nos mostrará 100% se o 'zap-results.sarif' foi criado ou não.
+      # ================================================================
+      - name: List files in workspace
+        if: always() # Sempre rode esta etapa, mesmo se o ZAP falhou
+        run: |
+          echo "Listando arquivos no diretório de trabalho:"
+          ls -laR
+       
+      - name: Convert ZAP results to SARIF
+        uses: SvanBoxel/zaproxy-to-ghas@v1.0.0 # Use the latest version
+
+      # Etapa de Upload
+      - name: Upload SARIF to GitHub Security Tab
+        if: always() # Mantemos always() por enquanto
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: results.sarif
+          # Path to SARIF file relative to the root of the repository
+          #sarif_file: zap-results.sarif
+          sarif_file: zap-results.sarif
+          # Optional category for the results
+          # Used to differentiate multiple results for one commit
+          category: owap-zap
