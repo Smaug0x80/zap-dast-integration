@@ -1,5 +1,5 @@
-# Nome do fluxo de trabalho: ZAP Full Scan (com conversão JSON->SARIF)
-name: ZAP Full Scan (com conversão JSON->SARIF)
+# Nome do fluxo de trabalho: DAST OWASP ZAP
+name: ZAP SCAN Basic
 
 on:
   # Gatilho manual (perfeito para testes)
@@ -7,10 +7,10 @@ on:
 
 jobs:
   zap_full_scan:
-    name: Run ZAP Full Scan (JSON -> SARIF)
+    name: Run ZAP Basic Scan
     runs-on: ubuntu-latest
    
-    # As permissões continuam sendo cruciais
+    # Definição de permissões necessárias
     permissions:
       contents: write
       pull-requests: write
@@ -21,10 +21,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Passo 2: Rodar o ZAP Full Scan
-      # Esta action é mais poderosa. Ela tem a lógica de conversão
-      # de JSON para SARIF embutida.
-      - name: ZAP Full Scan
+      # Passo 2: Rodar o ZAP Basic Scan
+      - name: ZAP Basic Scan
         #uses: zaproxy/action-full-scan@v0.11.0 # Note a action diferente
         uses: zaproxy/action-baseline@v0.14.0
         with:
