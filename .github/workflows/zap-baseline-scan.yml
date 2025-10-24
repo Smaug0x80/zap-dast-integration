@@ -23,7 +23,8 @@ jobs:
 
       # Passo 2: Rodar o ZAP Basic Scan
       - name: ZAP Basic Scan
-        uses: zaproxy/action-baseline@v0.14.0
+        #uses: zaproxy/action-baseline@v0.14.0
+        uses: zaproxy/action-full-scan@v0.13.0
         with:
           # Alvo de teste
           target: 'http://testphp.vulnweb.com/'
