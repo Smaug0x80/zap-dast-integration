@@ -23,7 +23,6 @@ jobs:
 
       # Passo 2: Rodar o ZAP Basic Scan
       - name: ZAP Basic Scan
-        #uses: zaproxy/action-full-scan@v0.11.0 # Note a action diferente
         uses: zaproxy/action-baseline@v0.14.0
         with:
           # Alvo de teste
