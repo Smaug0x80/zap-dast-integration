@@ -1,36 +1,47 @@
-# Nome do fluxo de trabalho: DAST OWASP ZAP
-name: ZAP SCAN Basic
+# Nome do fluxo: Teste de Integridade do Pipeline ZAP
+name: ZAP Pipeline Integrity Test
 
 on:
-  # Gatilho manual (perfeito para testes)
-  workflow_dispatch:
+  workflow_dispatch: # Gatilho manual
 
 jobs:
-  zap_full_scan:
-    name: Run ZAP Basic Scan
+  zap_pipeline_test:
+    name: Run ZAP Scan (on Example.com)
     runs-on: ubuntu-latest
    
-    # Definição de permissões necessárias
+    # Permissões são cruciais para a aba "Security"
     permissions:
-      contents: write
-      pull-requests: write
-      issues: write
+      contents: read
+      security-events: write
 
     steps:
-      # Passo 1: Checkout (necessário)
+      # Checkout é necessário
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Passo 2: Rodar o ZAP Basic Scan
-      - name: ZAP Basic Scan
-        #uses: zaproxy/action-baseline@v0.14.0
-        uses: zaproxy/action-full-scan@v0.13.0
+      # Ação de Scan com o conversor embutido
+      - name: ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.11.0
         with:
-          # Alvo de teste
-          target: 'http://testphp.vulnweb.com/'
+          # ===============================================
+          # A MUDANÇA CRÍTICA:
+          # Usando um alvo 100% estável para testar o pipeline
+          # ===============================================
+          target: 'http://example.com'
 
-      - name: Upload ZAP Report
-        uses: actions/upload-artifact@v4 # Use the latest version
+          # O nome do arquivo SARIF que a action vai gerar
+          sarif_file: 'zap-results.sarif'
+         
+          # IMPORTANTE:
+          # Vamos dizer ao ZAP para não falhar o build,
+          # pois 'example.com' não é vulnerável.
+          # Nosso objetivo é testar a INTEGRAÇÃO.
+          cmd_options: '-I'
+
+      # Etapa de Upload
+      # Se o passo anterior funcionar, este arquivo EXISTIRÁ.
+      - name: Upload SARIF to GitHub Security Tab
+        if: always() # Sempre tentar o upload
+        uses: github/codeql-action/upload-sarif@v2
         with:
-          name: zap-html-report
-          path: report_html.html 
+          sarif_file: 'zap-results.sarif'
