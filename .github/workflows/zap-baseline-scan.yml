@@ -1,47 +1,36 @@
-# Nome do fluxo: Teste de Integridade do Pipeline ZAP
-name: ZAP Pipeline Integrity Test
+# Nome do fluxo de trabalho: DAST OWASP ZAP
+name: ZAP SCAN Basic
 
 on:
-  workflow_dispatch: # Gatilho manual
+  # Gatilho manual (perfeito para testes)
+  workflow_dispatch:
 
 jobs:
-  zap_pipeline_test:
-    name: Run ZAP Scan (on Example.com)
+  zap_full_scan:
+    name: Run ZAP Basic Scan
     runs-on: ubuntu-latest
    
-    # Permissões são cruciais para a aba "Security"
+    # Definição de permissões necessárias
     permissions:
-      contents: read
-      security-events: write
+      contents: write
+      pull-requests: write
+      issues: write
 
     steps:
-      # Checkout é necessário
+      # Passo 1: Checkout (necessário)
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Ação de Scan com o conversor embutido
-      - name: ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.11.0
+      # Passo 2: Rodar o ZAP Basic Scan
+      - name: ZAP Basic Scan
+        #uses: zaproxy/action-baseline@v0.14.0
+        uses: zaproxy/action-full-scan@v0.13.0
         with:
-          # ===============================================
-          # A MUDANÇA CRÍTICA:
-          # Usando um alvo 100% estável para testar o pipeline
-          # ===============================================
-          target: 'http://example.com'
+          # Alvo de teste
+          target: 'http://testphp.vulnweb.com/'
 
-          # O nome do arquivo SARIF que a action vai gerar
-          sarif_file: 'zap-results.sarif'
-         
-          # IMPORTANTE:
-          # Vamos dizer ao ZAP para não falhar o build,
-          # pois 'example.com' não é vulnerável.
-          # Nosso objetivo é testar a INTEGRAÇÃO.
-          cmd_options: '-I'
-
-      # Etapa de Upload
-      # Se o passo anterior funcionar, este arquivo EXISTIRÁ.
-      - name: Upload SARIF to GitHub Security Tab
-        if: always() # Sempre tentar o upload
-        uses: github/codeql-action/upload-sarif@v2
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4 # Use the latest version
         with:
-          sarif_file: 'zap-results.sarif'
+          name: zap-html-report
+          path: report_html.html 
